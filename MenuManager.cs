@@ -36,8 +36,8 @@ namespace Freddys
 			"Selection: ",
 			"Confirmation: ",
 			"Freddy's Pizza\n    & Arcade",
-			"Game Project 0 Instructions:\nCurrently only the exit\nbutton has functionality to\nexit the game use the up\nor down arrow keys to select\nthe exit option\nand then hit 'E' on \nyour keyboard.",
-			"This game is a fan game of \nFive Nights at Freddy's;\nFive Nights at Freddy's \nby Scott Cawhthon" };
+			"Game Project 0 Instructions:\nCurrently only the exit\nbutton has functionality, to\nexit the game use the up\nor down arrow keys to select\nthe exit option. Then hit 'E' \non your keyboard and the \ngame will exit.",
+			"This game is a fan game of \nFive Nights at Freddy's;\nFive Nights at Freddy's \nby Scott Cawthon" };
 		/// <summary>
 		/// Gets the current keyboard state
 		/// </summary>
