@@ -361,8 +361,8 @@ namespace Freddys
 					{
 						bonAnimationColumn--;
 					}
+					bonAnimationTimer -= 1;
 				}
-				bonAnimationTimer -= 1;
 			}
 			var bonSource = new Rectangle(bonAnimationColumn * 144,bonAnimationFrameRow * 144, 144, 144);
 			spriteBatch.Draw(bonnie, new Vector2(125, 175), bonSource, Color.White, 0, new Vector2(0, 0), 1.45f, SpriteEffects.None, 0);
@@ -386,8 +386,8 @@ namespace Freddys
 					{
 						chicaAnimationColumn--;
 					}
+					chicaAnimationTimer -= 1;
 				}
-				chicaAnimationTimer -= 1;
 			}
 			var chicaSource = new Rectangle(chicaAnimationColumn * 144, chicaAnimationFrameRow * 144, 144, 144);
 			spriteBatch.Draw(chica, new Vector2(325, 175), chicaSource, Color.White, 0, new Vector2(0, 0), 1.45f, SpriteEffects.None, 0);
@@ -428,9 +428,9 @@ namespace Freddys
 				}
 				if (stageAnimationColumn == 7)
 				{
-					showtimeCount++;
 					canDeactivateShowtime = true;
 				}
+				showtimeCount++;
 			}
 			else if (isShowtime == false && showtimeCount != 0)
 			{
