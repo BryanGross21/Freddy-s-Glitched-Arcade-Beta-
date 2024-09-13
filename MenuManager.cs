@@ -36,7 +36,7 @@ namespace Freddys
 			"Selection: ",
 			"Confirmation: ",
 			"Freddy's Pizza\n    & Arcade",
-			"Game Project 0 Instructions:\nCurrently only the exit\nbutton has functionality, to\nexit the game use the up\nor down arrow keys to select\nthe exit option. Then hit 'E' \non your keyboard and the \ngame will exit.",
+			"Game Project 1 Instructions:\nThis build includes a small \ngame portion, to play hit 'E' on \nthe new game option. \nMore details on Git Release.",
 			"This game is a fan game of \nFive Nights at Freddy's;\nFive Nights at Freddy's \nby Scott Cawthon" };
 		/// <summary>
 		/// Gets the current keyboard state
@@ -144,6 +144,22 @@ namespace Freddys
 		public bool Exit { get; private set; }
 
 		/// <summary>
+		/// Sees to draw and process menu actions
+		/// </summary>
+		public bool inMenu { get; private set; }
+
+		/// <summary>
+		/// Process the input to start a new game
+		/// </summary>
+		public bool startNewGame { get; private set; }
+
+		public MenuManager() 
+		{
+			inMenu = true;
+			startNewGame = false;
+		}
+
+		/// <summary>
 		/// Loads the texture content for the menu
 		/// </summary>
 		/// <param name="content">The manager to load the content with</param>
@@ -168,132 +184,135 @@ namespace Freddys
 			pastKeyboardState = currentKeyboardState;
 			currentKeyboardState = Keyboard.GetState();
 			#endregion
+			if (inMenu)
+			{
+				#region Option Selection Input
+				//Get position from Keyboard
+				if (currentKeyboardState.IsKeyDown(Keys.Up) && pastKeyboardState.IsKeyUp(Keys.Up))
+				{
+					if ((int)menuSelection - 1 == 0)
+					{
+						menuSelection = Option.Exit;
+					}
+					else
+					{
+						menuSelection -= 1;
+					}
+				}
+				if (currentKeyboardState.IsKeyDown(Keys.Down) && pastKeyboardState.IsKeyUp(Keys.Down))
+				{
+					if ((int)menuSelection + 1 == 5)
+					{
+						menuSelection = Option.NewGame;
+					}
+					else
+					{
+						menuSelection += 1;
+					}
+				}
+				#endregion
 
-			#region Option Selection Input
-			//Get position from Keyboard
-			if (currentKeyboardState.IsKeyDown(Keys.Up) && pastKeyboardState.IsKeyUp(Keys.Up))
-			{
-				if ((int)menuSelection - 1 == 0)
+				#region Selection Action Input
+				if (currentKeyboardState.IsKeyDown(Keys.E) && menuSelection == Option.NewGame)
 				{
-					menuSelection = Option.Exit;
+					startNewGame = true;
+					inMenu = false;
 				}
-				else
+				if (currentKeyboardState.IsKeyDown(Keys.E) && menuSelection == Option.Exit)
 				{
-					menuSelection -= 1;
+					Exit = true;
 				}
+				#endregion
 			}
-			if (currentKeyboardState.IsKeyDown(Keys.Down) && pastKeyboardState.IsKeyUp(Keys.Down))
-			{
-				if ((int)menuSelection + 1 == 5)
-				{
-					menuSelection = Option.NewGame;
-				}
-				else
-				{
-					menuSelection += 1;
-				}
-			}
-			#endregion
-
-			#region Selection Action Input
-			if (currentKeyboardState.IsKeyDown(Keys.E) && menuSelection == Option.Exit)
-			{
-				Exit = true;
-			}
-			#endregion
 		}
 
 		public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
 		{
-			//The font color to draw
-			Color colorToDraw = Color.White;
-			//Handles the animation and drawing for the animated sign on the title
-			spriteBatch.Draw(Background, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1, SpriteEffects.None, 0);
-			signAnimationTimer += gameTime.ElapsedGameTime.TotalSeconds;
-			if (signAnimationTimer > .22)
+			if (inMenu )
 			{
-				signAnimationFrame++;
-				if (signAnimationFrame > 2) signAnimationFrame = 0;
-				signAnimationTimer -= .22;
-			}
-			var signSource = new Rectangle(signAnimationFrame * 256, 0, 256, 256);
-			spriteBatch.Draw(sign, new Vector2(150, -125), signSource, Color.White, 0, new Vector2(0, 0), 1.3f, SpriteEffects.None, 0);
-			spriteBatch.DrawString(titleFont, menuText[8], new Vector2(220, 72), Color.Goldenrod);
-
-			fredAnimationTimer += gameTime.ElapsedGameTime.TotalSeconds;
-			//Animates Freddy Fazbear on the menu, he emerges from the shadows, waves for a bit, and then reemerges into the shadows 
-			if (fredAnimationTimer > fredAnimationTime)
-			{
-				if (fredAnimationFrameRow == 0)
+				//The font color to draw
+				Color colorToDraw = Color.White;
+				//Handles the animation and drawing for the animated sign on the title
+				spriteBatch.Draw(Background, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1, SpriteEffects.None, 0);
+				signAnimationTimer += gameTime.ElapsedGameTime.TotalSeconds;
+				if (signAnimationTimer > .22)
 				{
-					fredAnimationColumn++;
-					if (fredAnimationColumn > 4) {
-						fredAnimationFrameRow = 1;
-						fredAnimationColumn = 0;
-						fredAnimationTime = .75;
-					}
+					signAnimationFrame++;
+					if (signAnimationFrame > 2) signAnimationFrame = 0;
+					signAnimationTimer -= .22;
 				}
-				else if (fredAnimationFrameRow == 1) 
+				var signSource = new Rectangle(signAnimationFrame * 256, 0, 256, 256);
+				spriteBatch.Draw(sign, new Vector2(150, -125), signSource, Color.White, 0, new Vector2(0, 0), 1.3f, SpriteEffects.None, 0);
+				spriteBatch.DrawString(titleFont, menuText[8], new Vector2(220, 72), Color.Goldenrod, 0, Vector2.Zero, 1f, SpriteEffects.None, 1);
+
+				fredAnimationTimer += gameTime.ElapsedGameTime.TotalSeconds;
+				//Animates Freddy Fazbear on the menu, he emerges from the shadows, waves for a bit, and then reemerges into the shadows 
+				if (fredAnimationTimer > fredAnimationTime)
 				{
-					fredAnimationColumn++;
-					if (fredAnimationColumn > 4)
+					if (fredAnimationFrameRow == 0)
 					{
-						fredAnimationColumn = 3;
+						fredAnimationColumn++;
+						if (fredAnimationColumn > 4)
+						{
+							fredAnimationFrameRow = 1;
+							fredAnimationColumn = 0;
+							fredAnimationTime = .75;
+						}
 					}
-				}
-				fredAnimationTimer -= fredAnimationTime;
-			}
-
-			var fredSource = new Rectangle(fredAnimationColumn * 144,fredAnimationFrameRow * 144, 144, 144);
-			spriteBatch.Draw(freddyFaz, new Vector2(212, 222), fredSource, Color.White, 0, new Vector2(0, 0), 1.45f, SpriteEffects.None, 0);
-
-			//Draws the door above Freddy
-			spriteBatch.Draw(door, new Vector2(226, 202), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
-			//This for loop sets-up the transparent grey background for menu options and the text
-			int j = 1;
-			for (int i = 0; i < 5; i++)
-			{
-				Vector2 Position = new Vector2(0, (64 * i));
-				if (i == 0)
-				{
-					spriteBatch.Draw(TitleBackground, Position, null, Color.White, 0, new Vector2(0, 0), new Vector2(1.5f, .5f), SpriteEffects.None, 0);
-				}
-				else if (i < 5)
-				{
-					if (i > 1) 
+					else if (fredAnimationFrameRow == 1)
 					{
-
-						Position.Y -= 32 * j;
-						j++;
+						fredAnimationColumn++;
+						if (fredAnimationColumn > 4)
+						{
+							fredAnimationColumn = 3;
+						}
 					}
-					spriteBatch.Draw(selectionBackground, Position, null, Color.White, 0, new Vector2(0, 0), new Vector2(.5f, .25f), SpriteEffects.None, 0);
+					fredAnimationTimer -= fredAnimationTime;
 				}
-				if (i > 0 && i <= 4)
+
+				var fredSource = new Rectangle(fredAnimationColumn * 144, fredAnimationFrameRow * 144, 144, 144);
+				spriteBatch.Draw(freddyFaz, new Vector2(212, 222), fredSource, Color.White, 0, new Vector2(0, 0), 1.45f, SpriteEffects.None, 0);
+
+				//Draws the door above Freddy
+				spriteBatch.Draw(door, new Vector2(226, 202), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+				spriteBatch.DrawString(titleFont, menuText[0], new Vector2(8, 16), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1);
+				//This for loop sets-up the transparent grey background for menu options and the text
+				int j = 1;
+				for (int i = 1; i < 5; i++)
 				{
-					if (i == (int)menuSelection) 
+					Vector2 Position = new Vector2(0, (64 * i));
+					if(i < 5)
 					{
-						colorToDraw = Color.Red;
-					}
-					spriteBatch.DrawString(menuTextFont, menuText[i], new Vector2(12, (64 * i) - 32 * (j - 1)), colorToDraw, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
-					colorToDraw = Color.White;
-				}
-				else
-				{
-					spriteBatch.DrawString(titleFont, menuText[i], new Vector2(8, 16), Color.White);
-				}
-			}
-			//Gets the second control from the controls_arrows sprite sheet
-			spriteBatch.Draw(TitleBackground, new Vector2(0, 192), null, Color.White, 0, new Vector2(0, 0), .85f, SpriteEffects.None, 0);
-			spriteBatch.DrawString(menuTextFont, menuText[5], new Vector2(2, 192), Color.White);
-			spriteBatch.DrawString(menuTextFont, menuText[6], new Vector2(4, 224), Color.White);
-			spriteBatch.DrawString(menuTextFont, menuText[7], new Vector2(2, 256), Color.White);
-			spriteBatch.Draw(movementControls, new Vector2(128, 192), new Rectangle(0,96,96,96), Color.White, 0, new Vector2(0,0), .65f, SpriteEffects.None, 1);
-			spriteBatch.Draw(confirm, new Vector2(172, 256), null, Color.White, 0, new Vector2(0,0), .35f, SpriteEffects.None, 1);
-			//Instructions for how to exit the game and credit to Five Nights at Freddy's original creator
-			spriteBatch.Draw(TitleBackground, new Vector2(404,256), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
-			spriteBatch.DrawString(creditFont, menuText[9], new Vector2(406, 256), Color.White);
-			spriteBatch.DrawString(creditFont, menuText[10], new Vector2(406, 400), Color.White);
+						if (i > 1)
+						{
 
+							Position.Y -= 32 * j;
+							j++;
+						}
+						spriteBatch.Draw(selectionBackground, Position, null, Color.White, 0, new Vector2(0, 0), new Vector2(.5f, .25f), SpriteEffects.None, 0);
+					}
+					if (i > 0 && i <= 4)
+					{
+						if (i == (int)menuSelection)
+						{
+							colorToDraw = Color.Red;
+						}
+						spriteBatch.DrawString(menuTextFont, menuText[i], new Vector2(12, (64 * i) - 32 * (j - 1)), colorToDraw, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+						colorToDraw = Color.White;
+					}
+				}
+				//Gets the second control from the controls_arrows sprite sheet
+				spriteBatch.Draw(TitleBackground, new Vector2(0, 192), null, Color.White, 0, new Vector2(0, 0), .85f, SpriteEffects.None, 0);
+				spriteBatch.DrawString(menuTextFont, menuText[5], new Vector2(2, 192), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1);
+				spriteBatch.DrawString(menuTextFont, menuText[6], new Vector2(4, 224), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1);
+				spriteBatch.DrawString(menuTextFont, menuText[7], new Vector2(2, 256), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1);
+				spriteBatch.Draw(movementControls, new Vector2(128, 192), new Rectangle(0, 96, 96, 96), Color.White, 0, new Vector2(0, 0), .65f, SpriteEffects.None, 1);
+				spriteBatch.Draw(confirm, new Vector2(172, 256), null, Color.White, 0, new Vector2(0, 0), .35f, SpriteEffects.None, 1);
+				//Instructions for how to exit the game and credit to Five Nights at Freddy's original creator
+				spriteBatch.Draw(TitleBackground, new Vector2(404, 256), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
+				spriteBatch.DrawString(creditFont, menuText[9], new Vector2(406, 256), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1);
+				spriteBatch.DrawString(creditFont, menuText[10], new Vector2(406, 400), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1);
+			}
 		}
 
 	}

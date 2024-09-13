@@ -1,14 +1,27 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.X3DAudio;
 
 namespace Freddys
 {
+	/// <summary>
+	/// Enum representing which state to draw
+	/// </summary>
+	public enum state
+	{
+		menu = 1,
+		game = 2,
+	}
+
 	public class GlitchedArcadeGame : Game
 	{
 		private GraphicsDeviceManager _graphics;
 		private SpriteBatch _spriteBatch;
 		private MenuManager menuManager;
+		private RoomManager roomManager;
+		private state currentGameState;
+		private bool newGame;
 
 		public GlitchedArcadeGame()
 		{
@@ -21,6 +34,7 @@ namespace Freddys
 		{
 			// TODO: Add your initialization logic here
 			menuManager = new();
+			roomManager = new();
 			_graphics.PreferredBackBufferWidth = 640;
 			_graphics.PreferredBackBufferHeight = 480;
 			_graphics.ApplyChanges();
@@ -32,6 +46,7 @@ namespace Freddys
 		{
 			_spriteBatch = new SpriteBatch(GraphicsDevice);
 			menuManager.LoadContent(Content);
+			roomManager.LoadContent(Content);
 
 			// TODO: use this.Content to load your game content here
 		}
@@ -40,22 +55,43 @@ namespace Freddys
 		{
 
 			// TODO: Add your update logic here
-
-			menuManager.update(gameTime);
-
-			if (menuManager.Exit) 
+			if (newGame == false)
 			{
-				Exit();
+				menuManager.update(gameTime);
+				if (menuManager.startNewGame)
+				{
+					newGame = true;
+				}
+				if (menuManager.Exit)
+				{
+					Exit();
+				}
 			}
+			else if (newGame) 
+			{
+				roomManager.update(gameTime);
+				if (roomManager.Exit) 
+				{
+					Exit();
+				}
+			}
+
 
 			base.Update(gameTime);
 		}
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.CornflowerBlue);
+			GraphicsDevice.Clear(Color.DarkGray);
 			_spriteBatch.Begin();
-			menuManager.Draw(gameTime, _spriteBatch);
+			if (newGame == false)
+			{
+				menuManager.Draw(gameTime, _spriteBatch);
+			}
+			else if (newGame == true)
+			{
+				roomManager.Draw(gameTime, _spriteBatch);
+			}
 			_spriteBatch.End();
 			// TODO: Add your drawing code here
 
